@@ -1,0 +1,16 @@
+:root {
+  --background-color: #ffffff;
+  --text-color: #333333;
+}
+
+/* Force dark theme properties */
+.dark-theme {
+  --background-color: #121212;
+  --text-color: #ffffff;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}

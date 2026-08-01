@@ -1,0 +1,59 @@
+<div class="phone">
+
+  <h2>Eruda Test Page</h2>
+
+  <div id="box" class="box">
+    DOM Test
+  </div>
+
+  <div class="counter">
+    Counter: {{ counter }}
+  </div>
+
+  <button (click)="increment()">Increment Counter</button>
+
+  <button (click)="log()">Console.log</button>
+
+  <button (click)="warn()">Console.warn</button>
+
+  <button (click)="error()">Console.error</button>
+
+  <button (click)="table()">Console.table</button>
+
+  <button (click)="saveStorage()">Save localStorage</button>
+
+  <button (click)="loadStorage()">Load localStorage</button>
+
+  <button (click)="fetchSuccess()">
+    Successful Fetch
+  </button>
+
+  <button (click)="fetch404()">
+    404 Fetch
+  </button>
+
+  <button (click)="fetchNetworkError()">
+    Network Error
+  </button>
+
+  <button (click)="timer()">
+    Timer
+  </button>
+
+  <button (click)="domChange()">
+    Modify DOM
+  </button>
+
+  <button (click)="promiseReject()">
+    Reject Promise
+  </button>
+
+  <button (click)="throwException()">
+    Throw Exception
+  </button>
+
+  <p *ngIf="loading">
+    Loading...
+  </p>
+
+</div>
