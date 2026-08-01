@@ -18,11 +18,11 @@ export class ErudaTestComponent {
   }
 
   warn() {
-    console.warn('This is a warning');
+    console.warn('This is a warning', new Date());
   }
 
   error() {
-    console.error('This is an error');
+    console.error('This is an error', new Date());
   }
 
   table() {
