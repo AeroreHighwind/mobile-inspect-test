@@ -9,6 +9,9 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./eruda-test.scss']
 })
 export class ErudaTestComponent {
+  constructor() {
+    this.fetchSuccess()
+  }
 
   counter = 0;
   loading = false;

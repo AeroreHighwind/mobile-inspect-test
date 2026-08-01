@@ -3,6 +3,7 @@ import { appConfig } from './app/app.config';
 import { App } from './app/app';
 import { environment } from './environments/environment';
 import { installConsoleBridge, bindEruda } from './app/dev/console-bridge.util';
+import erudaOpenOnStart, { applyOpenOnStart } from './app/dev/eruda-open-on-start.plugin';
 
 declare global {
   interface Window {
@@ -18,6 +19,8 @@ if (!environment.production) {
 
     import('eruda').then(({ default: eruda }) => {
       eruda.init();
+      eruda.add(erudaOpenOnStart);      // registers the toggle tab in eruda's panel
+      applyOpenOnStart(eruda)
 
       import('./app/dev/eruda-angular-devtools').then(({ default: erudaAngularDevtools }) => {
         eruda.add(erudaAngularDevtools);
