@@ -1,10 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
-import { ErudaTestComponent } from '../modules/eruda/eruda-test/eruda-test';
-import { ThemeService } from '../modules/utils/services/theme';
+import { ErudaTestComponent } from './modules/eruda/eruda-test/eruda-test';
+import { ThemeService } from './modules/utils/services/theme';
+import { DeviceInfo } from './modules/common/device-info/device-info';
 
 @Component({
   selector: 'app-root',
-  imports: [ErudaTestComponent],
+  imports: [ErudaTestComponent, DeviceInfo],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
