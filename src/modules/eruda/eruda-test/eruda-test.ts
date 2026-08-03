@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './eruda-test.html',
-  styleUrls: ['./eruda-test.scss']
+  styleUrls: ['./eruda-test.scss'],
+  
 })
 export class ErudaTestComponent {
   constructor() {

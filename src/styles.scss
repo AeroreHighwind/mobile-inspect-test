@@ -1,16 +1,98 @@
-:root {
-  --background-color: #ffffff;
-  --text-color: #333333;
+// ===== YoRHa Theme Tokens =====
+:root,
+.theme-dark {
+  --yorha-bg: #1a1a1a;
+  --yorha-bg-alt: #232019;
+  --yorha-text: #d8d0c0;
+  --yorha-text-bright: #e8dfc8;
+  --yorha-text-dim: #a89f86;
+  --yorha-border: #6b6248;
+  --yorha-border-bright: #d8d0c0;
+  --yorha-accent: #b8a568;
+  --yorha-danger: #a8453a;
+  --yorha-scanline: rgba(255, 255, 255, 0.02);
+  --yorha-shadow: rgba(0, 0, 0, 0.6);
 }
 
-/* Force dark theme properties */
-.dark-theme {
-  --background-color: #121212;
-  --text-color: #ffffff;
+// "Classic" mode — the cream/off-white menu look from the game's
+// system OS screens, black text on parchment
+.theme-light {
+  --yorha-bg: #e4ddc8;
+  --yorha-bg-alt: #d9d0b5;
+  --yorha-text: #2b2820;
+  --yorha-text-bright: #14120d;
+  --yorha-text-dim: #5a5442;
+  --yorha-border: #8c8264;
+  --yorha-border-bright: #2b2820;
+  --yorha-accent: #6b5f3a;
+  --yorha-danger: #7a2e24;
+  --yorha-scanline: rgba(0, 0, 0, 0.03);
+  --yorha-shadow: rgba(0, 0, 0, 0.15);
 }
 
+// ===== Global reset & base =====
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--yorha-bg);
+  color: var(--yorha-text);
+  font-family: 'Courier New', Courier, monospace;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+// subtle scanline texture app-wide
 body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  transition: background-color 0.3s ease;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, var(--yorha-scanline) 3px
+  );
+}
+
+// selection color to match the theme instead of default blue
+::selection {
+  background: var(--yorha-accent);
+  color: var(--yorha-bg);
+}
+
+// scrollbar styling for that OS-panel feel
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--yorha-bg-alt); }
+::-webkit-scrollbar-thumb {
+  background: var(--yorha-border);
+  border: 1px solid var(--yorha-bg-alt);
+}
+
+// links, if any
+a {
+  color: var(--yorha-accent);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// headings baseline
+h1, h2, h3 {
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--yorha-text-bright);
+}
+
+button {
+  height: 48px;
+  border: 1px solid var(--yorha-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--yorha-text);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }

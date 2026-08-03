@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { ErudaTestComponent } from './eruda-test/eruda-test';
+import { Component, inject, signal } from '@angular/core';
+import { ErudaTestComponent } from '../modules/eruda/eruda-test/eruda-test';
+import { ThemeService } from '../modules/utils/services/theme';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,14 @@ import { ErudaTestComponent } from './eruda-test/eruda-test';
 })
 export class App {
   protected readonly title = signal('mobile-app');
+  private readonly _themeService = inject(ThemeService);
+  
+  public toggleTheme() {
+    this._themeService.toggle()
+  }
+
+  getTheme() {
+    return this._themeService.theme();
+  }
+
 }

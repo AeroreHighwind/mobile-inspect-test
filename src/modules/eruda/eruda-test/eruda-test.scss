@@ -1,0 +1,85 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--yorha-bg);
+  color: var(--yorha-text);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.phone {
+  max-width: 380px;
+  margin: auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+h2 {
+  text-align: center;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--yorha-text-bright);
+  border-bottom: 1px solid var(--yorha-border);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+h2::before {
+  content: "YoRHa // ";
+  color: var(--yorha-text-dim);
+  font-size: 0.7em;
+  letter-spacing: 1px;
+}
+
+button::before {
+  content: "▸ ";
+  opacity: 0.6;
+}
+
+button:hover {
+  background: rgba(128, 128, 128, 0.1);
+  border-color: var(--yorha-border-bright);
+}
+
+button:active {
+  opacity: 0.7;
+  background: var(--yorha-text);
+  color: var(--yorha-bg);
+}
+
+.box {
+  padding: 20px;
+  border: 1px dashed var(--yorha-border);
+  border-radius: 0;
+  text-align: center;
+  color: var(--yorha-text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 13px;
+  position: relative;
+}
+
+.box::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--yorha-border-bright);
+  border-left: 2px solid var(--yorha-border-bright);
+}
+
+.counter {
+  font-size: 18px;
+  text-align: center;
+  font-weight: normal;
+  letter-spacing: 2px;
+  color: var(--yorha-text-bright);
+  border-top: 1px solid var(--yorha-border);
+  border-bottom: 1px solid var(--yorha-border);
+  padding: 10px 0;
+}

@@ -2,8 +2,8 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 import { environment } from './environments/environment';
-import { installConsoleBridge, bindEruda } from './app/dev/console-bridge.util';
-import erudaOpenOnStart, { applyOpenOnStart } from './app/dev/eruda-open-on-start.plugin';
+import { installConsoleBridge, bindEruda } from './modules/eruda/plugins/console-bridge.util';
+import erudaOpenOnStart, { applyOpenOnStart } from './modules/eruda/plugins/eruda-open-on-start.plugin';
 
 declare global {
   interface Window {
@@ -18,11 +18,13 @@ if (!environment.production) {
     window.__erudaInitialized = true;
 
     import('eruda').then(({ default: eruda }) => {
-      eruda.init();
+      eruda.init({
+        
+      });
       eruda.add(erudaOpenOnStart);      // registers the toggle tab in eruda's panel
       applyOpenOnStart(eruda)
 
-      import('./app/dev/eruda-angular-devtools').then(({ default: erudaAngularDevtools }) => {
+      import('./modules/eruda/plugins/eruda-angular-devtools.plugin').then(({ default: erudaAngularDevtools }) => {
         eruda.add(erudaAngularDevtools);
       });
 
