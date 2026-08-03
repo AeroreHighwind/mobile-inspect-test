@@ -185,9 +185,7 @@ class TrueNetworkTool implements Tool {
 
   private _injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement('style');
-    style.id = STYLE_ID;
-    style.textContent = `
+    const style  = `
       .tn-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; height: 100%; display: flex; flex-direction: column; color: inherit; background: rgba(0,0,0,.02); }
       .tn-toolbar { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-bottom: 1px solid rgba(128,128,128,.25); flex-wrap: wrap; }
       .tn-btn { border: 1px solid rgba(128,128,128,.35); background: transparent; color: inherit; border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
@@ -230,8 +228,7 @@ class TrueNetworkTool implements Tool {
       .tn-status-4xx { color: #d32f2f; }
       .tn-status-error { color: #d32f2f; }
     `;
-    document.head.appendChild(style);
-    eruda.util.evalCss(style.textContent)
+    eruda.util.evalCss(style)
   }
 
   private _renderShell() {

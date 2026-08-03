@@ -8,7 +8,6 @@ import erudaOpenOnStart, { applyOpenOnStart } from './app/modules/eruda/plugins/
 declare global {
   interface Window {
     __erudaInitialized?: boolean;
-    eruda?:any
   }
 }
 
@@ -30,7 +29,6 @@ if (!environment.production) {
       });
 
       import('./app/modules/eruda/plugins/true-network.plugin').then(({ default: networkPlugin }) => {
-              console.warn("networkPlugin", networkPlugin)
         eruda.add(networkPlugin);
       });
 

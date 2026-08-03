@@ -21,6 +21,7 @@
  *     eruda.add(erudaAngularDevtools);
  *   }
  */
+import eruda, { Tool } from 'eruda';
 
 var win = typeof window !== 'undefined' ? window : self;
 var doc = win.document;
@@ -145,11 +146,8 @@ function h(tag, attrs, children) {
     '.eruda-ng-hl-label { position: absolute; top: -18px; left: 0; background: #4285f4; color: #fff; font-size: 10px; padding: 1px 4px; border-radius: 2px; white-space: nowrap; }'
   ].join('\n');
 
-  function injectStyle() {
-    if (doc.getElementById(STYLE_ID)) return;
-    var style = h('style', { id: STYLE_ID });
-    style.textContent = CSS;
-    doc.head.appendChild(style);
+  function injectStyle(css: string) {
+    eruda.util.evalCss(css)
   }
 
   /* ------------------------------------------------------------------ *
@@ -274,7 +272,6 @@ function h(tag, attrs, children) {
     name: 'angular',
 
     init: function ($el) {
-      injectStyle();
       this._$el = $el;
       this._container = $el.get ? $el.get(0) : $el[0] || $el;
       this._highlighter = new Highlighter();
@@ -287,7 +284,7 @@ function h(tag, attrs, children) {
 
       this._onPickerMove = this._onPickerMove.bind(this);
       this._onPickerClick = this._onPickerClick.bind(this);
-
+      injectStyle(CSS);
       this._renderShell();
       this.refresh();
     },
