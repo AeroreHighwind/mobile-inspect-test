@@ -191,7 +191,8 @@ class TrueNetworkTool implements Tool {
       .tn-btn { border: 1px solid rgba(128,128,128,.35); background: transparent; color: inherit; border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
       .tn-btn:active { opacity: 0.9; }
       .tn-main { display: flex; flex: 1; min-height: 0; }
-      .tn-list-pane { width: 100%; min-width: 260px; border-right: 1px solid rgba(128,128,128,.25); display: flex; flex-direction: column; }
+      .tn-list-pane { flex: 0 0 320px; min-width: 260px; border-right: 1px solid rgba(128,128,128,.25); display: flex; flex-direction: column; }
+      .tn-detail-pane { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; }
       .tn-list-header, .tn-row { display: grid; grid-template-columns: minmax(0, 2.2fr) 52px 64px 64px 64px 60px; gap: 8px; align-items: center; }
       .tn-list-header { padding: 6px 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: 0.7; border-bottom: 1px solid rgba(128,128,128,.2); }
       .tn-list { flex: 1; overflow: auto; padding: 4px; }
@@ -209,8 +210,7 @@ class TrueNetworkTool implements Tool {
       .tn-pill-4xx { background: rgba(211,47,47,.16); color: #d32f2f; }
       .tn-pill-error { background: rgba(211,47,47,.16); color: #d32f2f; }
       .tn-col-type, .tn-col-size, .tn-col-time { opacity: 0.8; font-size: 11px; }
-      .tn-detail-pane { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-      .tn-detail-toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid rgba(128,128,128,.2); }
+      .tn-detail-toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid rgba(128,128,128,.2); flex-wrap: wrap; }
       .tn-tab { border: 1px solid rgba(128,128,128,.25); background: transparent; color: inherit; border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
       .tn-tab.active { background: rgba(64, 120, 242, 0.2); border-color: rgba(64, 120, 242, 0.6); }
       .tn-detail-body { flex: 1; overflow: auto; padding: 8px; }
