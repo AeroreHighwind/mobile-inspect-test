@@ -157,6 +157,7 @@ class TrueNetworkTool implements Tool {
   private _interceptorsInstalled = false;
   private _selectedId: string | null = null;
   private _activeTab: DetailTab = 'summary';
+  private _mobileSheetOpen = false;
 
   init($el: any) {
     this._$el = $el;
@@ -186,7 +187,7 @@ class TrueNetworkTool implements Tool {
   private _injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     const style  = `
-      .tn-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; height: 100%; display: flex; flex-direction: column; color: inherit; background: rgba(0,0,0,.02); }
+      .tn-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; height: 100%; display: flex; flex-direction: column; color: inherit; background: rgba(0,0,0,.02); position: relative; overflow: hidden; }
       .tn-toolbar { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-bottom: 1px solid rgba(128,128,128,.25); flex-wrap: wrap; }
       .tn-btn { border: 1px solid rgba(128,128,128,.35); background: transparent; color: inherit; border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
       .tn-btn:active { opacity: 0.9; }
@@ -212,6 +213,12 @@ class TrueNetworkTool implements Tool {
       .tn-col-type, .tn-col-size, .tn-col-time { opacity: 0.8; font-size: 11px; }
       .tn-detail-toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid rgba(128,128,128,.2); flex-wrap: wrap; }
       .tn-tab { border: 1px solid rgba(128,128,128,.25); background: transparent; color: inherit; border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
+      .tn-mobile-sheet { position: absolute; inset: 0; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.35); z-index: 5; }
+      .tn-mobile-sheet.open { display: flex; }
+      .tn-mobile-sheet-panel { width: 100%; max-width: 720px; max-height: 88vh; display: flex; flex-direction: column; background: inherit; border-radius: 14px 14px 0 0; box-shadow: 0 -10px 28px rgba(0,0,0,.2); overflow: hidden; }
+      .tn-mobile-sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid rgba(128,128,128,.2); }
+      .tn-mobile-sheet-title { font-weight: 600; }
+      .tn-mobile-detail-body { flex: 1; overflow: auto; padding: 8px; }
       .tn-tab.active { background: rgba(64, 120, 242, 0.2); border-color: rgba(64, 120, 242, 0.6); }
       .tn-detail-body { flex: 1; overflow: auto; padding: 8px; }
       .tn-empty { padding: 16px 8px; opacity: 0.6; }
@@ -227,6 +234,12 @@ class TrueNetworkTool implements Tool {
       .tn-status-2xx { color: #2e7d32; }
       .tn-status-4xx { color: #d32f2f; }
       .tn-status-error { color: #d32f2f; }
+      @media (max-width: 768px) {
+        .tn-main { flex-direction: column; }
+        .tn-list-pane { flex: 0 0 48vh; min-width: 0; border-right: 0; border-bottom: 1px solid rgba(128,128,128,.25); }
+        .tn-detail-pane { display: none; }
+        .tn-list-header { grid-template-columns: minmax(0, 2.2fr) 50px 48px 50px 50px 48px; }
+      }
     `;
     eruda.util.evalCss(style)
   }
@@ -259,6 +272,15 @@ class TrueNetworkTool implements Tool {
             <div class="tn-detail-body"></div>
           </div>
         </div>
+        <div class="tn-mobile-sheet" aria-hidden="true">
+          <div class="tn-mobile-sheet-panel">
+            <div class="tn-mobile-sheet-header">
+              <div class="tn-mobile-sheet-title">Request details</div>
+              <button class="tn-btn tn-close-detail">Close</button>
+            </div>
+            <div class="tn-mobile-detail-body"></div>
+          </div>
+        </div>
       </div>
     `);
     this._root = (this._$el[0] || this._$el) as HTMLElement;
@@ -272,11 +294,19 @@ class TrueNetworkTool implements Tool {
       const clearButton = target.closest('.tn-clear');
       const row = target.closest('.tn-row');
       const tab = target.closest('.tn-tab');
+      const closeButton = target.closest('.tn-close-detail');
 
       if (clearButton) {
         this._entries = [];
         this._selectedId = null;
+        this._mobileSheetOpen = false;
         this._renderList();
+        return;
+      }
+
+      if (closeButton) {
+        this._mobileSheetOpen = false;
+        this._syncMobileSheet();
         return;
       }
 
@@ -284,6 +314,7 @@ class TrueNetworkTool implements Tool {
         const id = row.getAttribute('data-id');
         if (id) {
           this._selectedId = id;
+          this._mobileSheetOpen = this._isMobileViewport();
           this._renderList();
         }
       }
@@ -482,6 +513,19 @@ class TrueNetworkTool implements Tool {
     this._renderList();
   }
 
+  private _isMobileViewport(): boolean {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  private _syncMobileSheet() {
+    const sheet = this._root?.querySelector('.tn-mobile-sheet') as HTMLElement | null;
+    if (!sheet) return;
+    const shouldOpen = this._isMobileViewport() && this._mobileSheetOpen && !!this._selectedId && this._entries.some((entry) => entry.id === this._selectedId);
+    sheet.classList.toggle('open', shouldOpen);
+    sheet.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+  }
+
   private _renderList() {
     const list = this._root?.querySelector('.tn-list') as HTMLElement | null;
     const count = this._root?.querySelector('.tn-count') as HTMLElement | null;
@@ -521,13 +565,15 @@ class TrueNetworkTool implements Tool {
 
     list.innerHTML = rows.join('');
     this._renderDetail();
+    this._syncMobileSheet();
   }
 
   private _renderDetail() {
     const detail = this._root?.querySelector('.tn-detail-body') as HTMLElement | null;
+    const mobileDetail = this._root?.querySelector('.tn-mobile-detail-body') as HTMLElement | null;
     const tabs = this._root?.querySelectorAll('.tn-tab') as NodeListOf<HTMLElement> | null;
 
-    if (!detail) return;
+    if (!detail && !mobileDetail) return;
 
     if (tabs) {
       tabs.forEach((tab) => {
@@ -537,60 +583,67 @@ class TrueNetworkTool implements Tool {
     }
 
     const selected = this._entries.find((entry) => entry.id === this._selectedId);
-    if (!selected) {
-      detail.innerHTML = '<div class="tn-empty">Select a request to inspect headers and payload.</div>';
-      return;
-    }
+    const emptyMarkup = '<div class="tn-empty">Select a request to inspect headers and payload.</div>';
+    const renderInto = (target: HTMLElement | null) => {
+      if (!target) return;
+      if (!selected) {
+        target.innerHTML = emptyMarkup;
+        return;
+      }
 
-    if (this._activeTab === 'headers') {
-      detail.innerHTML = `
+      if (this._activeTab === 'headers') {
+        target.innerHTML = `
+          <div class="tn-card">
+            <div class="tn-card-title">Request headers</div>
+            ${this._renderHeaderList(selected.requestHeaders)}
+          </div>
+          <div class="tn-card">
+            <div class="tn-card-title">Response headers</div>
+            ${this._renderHeaderList(selected.responseHeaders)}
+          </div>
+        `;
+        return;
+      }
+
+      if (this._activeTab === 'payload') {
+        target.innerHTML = `
+          <div class="tn-card">
+            <div class="tn-card-title">Request payload</div>
+            ${selected.requestBody ? `<pre class="tn-pre">${escapeHtml(selected.requestBody)}</pre>` : '<div class="tn-empty">No request body captured.</div>'}
+          </div>
+          <div class="tn-card">
+            <div class="tn-card-title">Response payload</div>
+            ${selected.responseBody ? `<pre class="tn-pre">${escapeHtml(selected.responseBody)}</pre>` : '<div class="tn-empty">No response body captured yet.</div>'}
+          </div>
+        `;
+        return;
+      }
+
+      target.innerHTML = `
         <div class="tn-card">
-          <div class="tn-card-title">Request headers</div>
-          ${this._renderHeaderList(selected.requestHeaders)}
+          <div class="tn-card-title">Overview</div>
+          <div class="tn-grid">
+            <div class="tn-label">Method</div><div>${escapeHtml(selected.method)}</div>
+            <div class="tn-label">Status</div><div class="${selected.isError ? 'tn-status-error' : selected.status && selected.status >= 400 ? 'tn-status-4xx' : selected.status && selected.status >= 200 && selected.status < 300 ? 'tn-status-2xx' : ''}">${escapeHtml(selected.state === 'pending' ? 'Pending' : selected.isError ? 'ERR' : selected.status ? `${selected.status} ${selected.statusText}` : '–')}</div>
+            <div class="tn-label">Type</div><div>${escapeHtml(selected.type.toUpperCase())}</div>
+            <div class="tn-label">Duration</div><div>${escapeHtml(formatMs(selected.duration))}</div>
+            <div class="tn-label">URL</div><div class="tn-url">${escapeHtml(selected.url)}</div>
+          </div>
         </div>
         <div class="tn-card">
-          <div class="tn-card-title">Response headers</div>
-          ${this._renderHeaderList(selected.responseHeaders)}
+          <div class="tn-card-title">Request details</div>
+          <div class="tn-grid">
+            <div class="tn-label">Name</div><div>${escapeHtml(selected.name || selected.path || selected.url)}</div>
+            <div class="tn-label">Path</div><div>${escapeHtml(selected.path)}</div>
+            <div class="tn-label">Request body</div><div>${escapeHtml(selected.requestBody ? 'Captured' : 'None')}</div>
+            <div class="tn-label">Response body</div><div>${escapeHtml(selected.responseBody ? 'Captured' : 'None')}</div>
+          </div>
         </div>
       `;
-      return;
-    }
+    };
 
-    if (this._activeTab === 'payload') {
-      detail.innerHTML = `
-        <div class="tn-card">
-          <div class="tn-card-title">Request payload</div>
-          ${selected.requestBody ? `<pre class="tn-pre">${escapeHtml(selected.requestBody)}</pre>` : '<div class="tn-empty">No request body captured.</div>'}
-        </div>
-        <div class="tn-card">
-          <div class="tn-card-title">Response payload</div>
-          ${selected.responseBody ? `<pre class="tn-pre">${escapeHtml(selected.responseBody)}</pre>` : '<div class="tn-empty">No response body captured yet.</div>'}
-        </div>
-      `;
-      return;
-    }
-
-    detail.innerHTML = `
-      <div class="tn-card">
-        <div class="tn-card-title">Overview</div>
-        <div class="tn-grid">
-          <div class="tn-label">Method</div><div>${escapeHtml(selected.method)}</div>
-          <div class="tn-label">Status</div><div class="${selected.isError ? 'tn-status-error' : selected.status && selected.status >= 400 ? 'tn-status-4xx' : selected.status && selected.status >= 200 && selected.status < 300 ? 'tn-status-2xx' : ''}">${escapeHtml(selected.state === 'pending' ? 'Pending' : selected.isError ? 'ERR' : selected.status ? `${selected.status} ${selected.statusText}` : '–')}</div>
-          <div class="tn-label">Type</div><div>${escapeHtml(selected.type.toUpperCase())}</div>
-          <div class="tn-label">Duration</div><div>${escapeHtml(formatMs(selected.duration))}</div>
-          <div class="tn-label">URL</div><div class="tn-url">${escapeHtml(selected.url)}</div>
-        </div>
-      </div>
-      <div class="tn-card">
-        <div class="tn-card-title">Request details</div>
-        <div class="tn-grid">
-          <div class="tn-label">Name</div><div>${escapeHtml(selected.name || selected.path || selected.url)}</div>
-          <div class="tn-label">Path</div><div>${escapeHtml(selected.path)}</div>
-          <div class="tn-label">Request body</div><div>${escapeHtml(selected.requestBody ? 'Captured' : 'None')}</div>
-          <div class="tn-label">Response body</div><div>${escapeHtml(selected.responseBody ? 'Captured' : 'None')}</div>
-        </div>
-      </div>
-    `;
+    renderInto(detail);
+    renderInto(mobileDetail);
   }
 
   private _renderHeaderList(headers: Record<string, string>): string {
