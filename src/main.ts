@@ -8,6 +8,7 @@ import erudaOpenOnStart, { applyOpenOnStart } from './app/modules/eruda/plugins/
 declare global {
   interface Window {
     __erudaInitialized?: boolean;
+    eruda?:any
   }
 }
 
@@ -26,6 +27,11 @@ if (!environment.production) {
 
       import('./app/modules/eruda/plugins/eruda-angular-devtools.plugin').then(({ default: erudaAngularDevtools }) => {
         eruda.add(erudaAngularDevtools);
+      });
+
+      import('./app/modules/eruda/plugins/true-network.plugin').then(({ default: networkPlugin }) => {
+              console.warn("networkPlugin", networkPlugin)
+        eruda.add(networkPlugin);
       });
 
       // stop eruda from monkey-patching window.console itself - we take
