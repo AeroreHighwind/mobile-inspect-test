@@ -11,6 +11,8 @@ import { Loading } from '../../common/loading/loading';
   
 })
 export class ErudaTestComponent {
+  public showSetup = false;
+
   constructor() {
     this.fetchSuccess()
   }
@@ -96,15 +98,8 @@ export class ErudaTestComponent {
     throw new Error('Dummy exception');
   }
 
-  timer() {
-    this.loading = true
-    console.time('demo');
-
-    setTimeout(() => {
-      console.timeEnd('demo');
-      console.log('Timeout executed');
-      this.loading = false
-    }, 2000);
+  showOrHideSetup(value: boolean) {
+    this.showSetup = value;
   }
 
   domChange() {

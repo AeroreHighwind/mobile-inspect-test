@@ -1,12 +1,14 @@
 <div class="phone">
   <div class="left">
-    <app-loading></app-loading>
+    @if (showSetup) {
+    <app-loading (setupFinished)="showOrHideSetup(false)" />
+    }
   </div>
-    <div style=" display: flex; justify-content: center; align-items: center; justify-items: center;">
-        <svg width="100" height="150" viewBox="0 0 400 400" >
-            <use href="/svg/yorha_logo.svg#icon-id"></use>
-        </svg>
-    </div>
+  <div style=" display: flex; justify-content: center; align-items: center; justify-items: center;">
+    <svg width="100" height="150" viewBox="0 0 400 400">
+      <use href="/svg/yorha_logo.svg#icon-id"></use>
+    </svg>
+  </div>
   <h2>Debugger</h2>
 
   <div id="box" class="box">
@@ -43,7 +45,7 @@
     Network Error
   </button>
 
-  <button (click)="timer()">
+  <button (click)="showOrHideSetup(true)">
     Timer
   </button>
 
@@ -58,11 +60,5 @@
   <button (click)="throwException()">
     Throw Exception
   </button>
-
-  @if (loading) {
-    <p>
-      Loading...
-    </p>
-  }
 
 </div>

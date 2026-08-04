@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
 import { BootStep, bootSteps } from '../../utils/data/loading-screen';
 
 interface DisplayBootStep extends BootStep {
@@ -15,15 +15,18 @@ interface DisplayBootStep extends BootStep {
 export class Loading implements OnInit {
 
   private readonly typingSpeed = 18;
-  private readonly lineDelay = 120;
+  private readonly lineDelay = 100;
   private readonly valueDelay = 90;
-
   private readonly bootSteps = bootSteps;
+  public readonly finished = signal(false);
+  public readonly visibleSteps = signal<DisplayBootStep[]>([]);
+  @Output() setupFinished = new EventEmitter<void>();
 
-  readonly visibleSteps = signal<DisplayBootStep[]>([]);
+  ngOnInit() {
+    this.handleBootsteps()
+  }
 
-  async ngOnInit() {
-
+  private async handleBootsteps(): Promise<void> {
     for (const step of this.bootSteps) {
 
       const current: DisplayBootStep = {
@@ -48,11 +51,10 @@ export class Loading implements OnInit {
         await this.typeText(current, 'value');
 
       }
-
       await this.sleep(this.lineDelay);
-
+      
+      if(this.visibleSteps().length === bootSteps.length) this.emitFinish()
     }
-
   }
 
   private async typeText(
@@ -67,13 +69,9 @@ export class Loading implements OnInit {
     for (let i = 0; i < text.length; i++) {
 
       if (field === 'label') {
-
         step.displayedLabel += text[i];
-
       } else {
-
         step.displayedValue += text[i];
-
       }
 
       this.visibleSteps.update(v => [...v]);
@@ -86,6 +84,13 @@ export class Loading implements OnInit {
 
   private sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  public emitFinish() {
+    this.finished.update(() => true)
+    setTimeout(() => {
+         this.setupFinished.emit()
+    }, 3000);
   }
 
 }

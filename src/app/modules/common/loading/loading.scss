@@ -1,60 +1,71 @@
-:host{
-
-    display:block;
-
+:host {
+    display: block;
     font-family: var(--yorha-font);
-
-    user-select:none;
-
+    user-select: none;
 }
 
-.boot-log{
-
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-
+.boot-log {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 35rem;
 }
 
-.boot-line{
+.boot-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px;
+    column-gap: 24px;
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    align-items: center;
 
-    min-height:20px;
+    min-height: 20px;
 
-    color:#8d8d8d;
-
-    opacity:.55;
+    color: #8d8d8d;
+    opacity: .55;
 
     transition:
         opacity .25s,
         color .25s,
         text-shadow .25s;
-
 }
 
-.boot-line.active{
-
-    opacity:1;
-    color:white;
-    text-shadow:0 0 6px rgba(150,240,255,.55);
-
+.boot-line.active {
+    opacity: 1;
+    color: white;
+    text-shadow: 0 0 6px rgba(150, 240, 255, .55);
 }
 
-.label{
-
-    white-space:pre;
-
+.label {
+    white-space: pre;
+    overflow: hidden;
 }
 
-.status{
+.status {
+    text-align: left;
+    color: #9deff2;
+    white-space: nowrap;
+}
 
-    margin-left:16px;
+.loading-container {
+    animation: screenFadeIn .35s ease-out;
+}
 
-    color:#9deff2;
+.loading-container.fade-out {
+    animation: screenFadeOut .7s ease forwards;
+}
 
-    white-space:pre;
+@keyframes screenFadeOut {
+
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-6px);
+        filter: blur(2px);
+    }
 
 }
