@@ -27,6 +27,7 @@ export class Loading implements OnInit {
   }
 
   private async handleBootsteps(): Promise<void> {
+    console.warn('Beggining System Setup')
     for (const step of this.bootSteps) {
 
       const current: DisplayBootStep = {
@@ -49,7 +50,7 @@ export class Loading implements OnInit {
         this.visibleSteps.update(v => [...v]);
 
         await this.typeText(current, 'value');
-
+        console.log(`${current.label}: ${current.value}`)
       }
       await this.sleep(this.lineDelay);
       
@@ -88,9 +89,10 @@ export class Loading implements OnInit {
 
   public emitFinish() {
     this.finished.update(() => true)
+    console.warn('System Setup has finished')
     setTimeout(() => {
          this.setupFinished.emit()
-    }, 3000);
+    }, 500);
   }
 
 }
