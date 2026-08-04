@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
 import { BootStep, bootSteps } from '../../utils/data/loading-screen';
+import { getDayPart } from '../../utils/functions/getDayPart';
 
 interface DisplayBootStep extends BootStep {
   displayedLabel: string;
@@ -90,6 +91,7 @@ export class Loading implements OnInit {
   public emitFinish() {
     this.finished.update(() => true)
     console.warn('System Setup has finished')
+    console.info(`Good ${getDayPart()}, Number 21`)
     setTimeout(() => {
          this.setupFinished.emit()
     }, 500);
