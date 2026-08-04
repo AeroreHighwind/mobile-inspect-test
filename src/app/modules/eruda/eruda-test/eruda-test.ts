@@ -14,7 +14,7 @@ import { ThemeService } from '../../utils/services/theme';
   providers: [TitleCasePipe],
   templateUrl: './eruda-test.html',
   styleUrls: ['./eruda-test.scss'],
-  
+
 })
 export class ErudaTestComponent {
   private readonly _androidService = inject(AndroidService);
@@ -105,7 +105,7 @@ export class ErudaTestComponent {
   }
 
   showOrHideSetup(value: boolean) {
-    if(!value) this.getMVA();
+    if (!value) this.getMVA();
     this.showSetup = value;
   }
 
@@ -120,42 +120,41 @@ export class ErudaTestComponent {
     }
   }
 
-  nextAndroid () {
+  nextAndroid() {
     this._androidService.getNextAndroid().pipe(
       takeUntilDestroyed(this._destroyRef),
-      tap((a) => this._currentAndroid.update(()=> a))
+      tap((a) => this._currentAndroid.update(() => a))
     ).subscribe()
   }
 
-  previousAndroid () {
+  previousAndroid() {
     this._androidService.getPreviousAndroid().pipe(
       takeUntilDestroyed(this._destroyRef),
-      tap((a) => this._currentAndroid.update(()=> a))
+      tap((a) => this._currentAndroid.update(() => a))
     ).subscribe()
   }
 
   public getAndroidFullModel() {
-    if(!this.selectedAndroid) return 'Android data unavailable'
+    if (!this.selectedAndroid) return 'Android data unavailable'
     const android = this.selectedAndroid;
     const modelName = this._titleCase.transform(android.modelName);
     return `YoRHa ${modelName} Type Number ${android.modelNumber}`;
   }
 
   private getMVA() {
-      this._androidService.getAndroidById(2).pipe(
+    this._androidService.getAndroidById(2).pipe(
       takeUntilDestroyed(this._destroyRef),
-      tap((a) => this._currentAndroid.update(()=> a))
+      tap((a) => this._currentAndroid.update(() => a))
     ).subscribe()
   }
 
-  get selectedAndroid () {
+  get selectedAndroid() {
     const computedAndroid = computed(() => this._currentAndroid())
     return computedAndroid();
   }
 
   get currentTheme() {
-      const val = this._theme() as string;
-  console.log('[currentTheme getter called]', val);
-  return val;
+    const val = this._theme() as string;
+    return val;
   }
 }
