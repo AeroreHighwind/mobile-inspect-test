@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Loading } from '../../common/loading/loading';
 
 @Component({
   selector: 'app-eruda-test',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Loading],
   templateUrl: './eruda-test.html',
   styleUrls: ['./eruda-test.scss'],
   
@@ -96,11 +97,13 @@ export class ErudaTestComponent {
   }
 
   timer() {
+    this.loading = true
     console.time('demo');
 
     setTimeout(() => {
       console.timeEnd('demo');
       console.log('Timeout executed');
+      this.loading = false
     }, 2000);
   }
 

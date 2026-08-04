@@ -1,0 +1,60 @@
+:host{
+
+    display:block;
+
+    font-family: var(--yorha-font);
+
+    user-select:none;
+
+}
+
+.boot-log{
+
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+
+}
+
+.boot-line{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    min-height:20px;
+
+    color:#8d8d8d;
+
+    opacity:.55;
+
+    transition:
+        opacity .25s,
+        color .25s,
+        text-shadow .25s;
+
+}
+
+.boot-line.active{
+
+    opacity:1;
+    color:white;
+    text-shadow:0 0 6px rgba(150,240,255,.55);
+
+}
+
+.label{
+
+    white-space:pre;
+
+}
+
+.status{
+
+    margin-left:16px;
+
+    color:#9deff2;
+
+    white-space:pre;
+
+}

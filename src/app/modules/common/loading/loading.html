@@ -1,0 +1,34 @@
+<h1 class="title">
+    LOADING<span>.</span>
+</h1>
+
+<div class="boot-log">
+
+    @for(step of visibleSteps(); track $index){
+
+        <div
+            class="boot-line"
+            animate.enter="boot-line-enter"
+            [class.active]="$last">
+
+            <span class="label">
+                {{step.displayedLabel}}
+            </span>
+
+            @if(step.showValue){
+
+                <span
+                    class="status"
+                    animate.enter="status-enter">
+
+                    {{step.displayedValue}}
+
+                </span>
+
+            }
+
+        </div>
+
+    }
+
+</div>
