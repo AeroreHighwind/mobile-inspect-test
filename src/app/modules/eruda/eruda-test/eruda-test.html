@@ -17,10 +17,17 @@
     Counter: {{ counter }}
   </div>
 
+  <div class="counter android-name-visor">
+    {{getAndroidFullModel() }}
+  </div>
+
   <button (click)="increment()">Increment Counter</button>
 
   <button (click)="showOrHideSetup(true)">Setup</button>
 
+  <button (click)="nextAndroid()">Next Android</button>
+  <button (click)="previousAndroid()">Previous Android</button>
+  
   <button (click)="log()">Console.log</button>
   
   <button (click)="warn()">Console.warn</button>

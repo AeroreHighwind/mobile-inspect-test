@@ -1,0 +1,15 @@
+export interface Android {
+    id: number;
+    modelName: string;
+    modelNumber: number;
+    humanName?: string;
+    gender: 'male' | 'female';
+}
+
+export const ANDROIDS: Android[] = [
+    { id:1, modelName: 'Attacker', modelNumber: 7, gender: 'female'},
+    { id:2, modelName: 'Scanner', modelNumber: 21, gender: 'female', humanName: 'Azalea'},
+    { id:3, modelName: 'Gunner', modelNumber: 35, gender: 'male', humanName: 'Ren'},
+    { id:4, modelName: 'Defender', modelNumber: 11, gender: 'male', humanName: 'Ash'},
+    { id:5, modelName: 'Healer', modelNumber: 15, gender: 'male'},
+]

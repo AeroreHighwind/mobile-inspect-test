@@ -1,24 +1,28 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Loading } from '../../common/loading/loading';
+import { AndroidService } from '../../yorha/services/android-service';
+import { Android } from '../../yorha/data/android-models';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-eruda-test',
   standalone: true,
   imports: [CommonModule, Loading],
+  providers: [TitleCasePipe],
   templateUrl: './eruda-test.html',
   styleUrls: ['./eruda-test.scss'],
   
 })
 export class ErudaTestComponent {
+  private readonly _androidService = inject(AndroidService);
+  private readonly _currentAndroid = signal<Android>(null);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _titleCase = inject(TitleCasePipe)
   public showSetup = false;
-
-  constructor() {
-    this.fetchSuccess()
-  }
-
-  counter = 0;
-  loading = false;
+  public counter = 0;
+  public loading = false;
 
   log() {
     console.log('Hello from Angular!', new Date());
@@ -34,9 +38,9 @@ export class ErudaTestComponent {
 
   table() {
     console.table([
-      { id: 1, name: 'Alice', role: 'Admin' },
-      { id: 2, name: 'Bob', role: 'User' },
-      { id: 3, name: 'Charlie', role: 'Guest' }
+      { id: 3, name: '1C', role: 'Commander' },
+      { id: 1, name: '33O', role: 'Operator' },
+      { id: 2, name: '51O', role: 'Operator' }
     ]);
   }
 
@@ -99,6 +103,7 @@ export class ErudaTestComponent {
   }
 
   showOrHideSetup(value: boolean) {
+    if(!value) this.getMVA();
     this.showSetup = value;
   }
 
@@ -111,5 +116,38 @@ export class ErudaTestComponent {
       box.style.color = 'white';
       console.log('DOM modified');
     }
+  }
+
+  nextAndroid () {
+    this._androidService.getNextAndroid().pipe(
+      takeUntilDestroyed(this._destroyRef),
+      tap((a) => this._currentAndroid.update(()=> a))
+    ).subscribe()
+  }
+
+  previousAndroid () {
+    this._androidService.getPreviousAndroid().pipe(
+      takeUntilDestroyed(this._destroyRef),
+      tap((a) => this._currentAndroid.update(()=> a))
+    ).subscribe()
+  }
+
+  public getAndroidFullModel() {
+    if(!this.selectedAndroid) return 'Android data unavailable'
+    const android = this.selectedAndroid;
+    const modelName = this._titleCase.transform(android.modelName);
+    return `YoRHa ${modelName} Type Number ${android.modelNumber}`;
+  }
+
+  private getMVA() {
+      this._androidService.getAndroidById(2).pipe(
+      takeUntilDestroyed(this._destroyRef),
+      tap((a) => this._currentAndroid.update(()=> a))
+    ).subscribe()
+  }
+
+  get selectedAndroid () {
+    const computedAndroid = computed(() => this._currentAndroid())
+    return computedAndroid();
   }
 }

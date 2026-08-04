@@ -103,18 +103,24 @@ function headersToObj(headers: any): Record<string, string> {
     return obj;
   }
   if (typeof headers === 'object') {
-    if (Array.isArray(headers)) {
-      headers.forEach((pair: [string, string]) => {
-        obj[pair[0]] = pair[1];
-      });
-    } else if (typeof headers.forEach === 'function') {
-      headers.forEach((value: string, key: string) => {
-        obj[key] = value;
-      });
-    } else {
-      Object.keys(headers).forEach((key) => {
-        obj[key] = headers[key];
-      });
+    try {
+      if (Array.isArray(headers)) {
+        headers.forEach((pair: [string, string]) => {
+          if (pair && pair.length >= 2) {
+            obj[pair[0]] = pair[1];
+          }
+        });
+      } else if (typeof headers.forEach === 'function') {
+        headers.forEach((value: string, key: string) => {
+          obj[key] = value;
+        });
+      } else {
+        Object.keys(headers).forEach((key) => {
+          obj[key] = headers[key];
+        });
+      }
+    } catch {
+      // Ignore malformed header containers and continue with collected values.
     }
   }
   return obj;
@@ -125,15 +131,19 @@ function bodyToDisplayString(body: any): string {
   if (typeof body === 'string') return body;
   if (body instanceof URLSearchParams) return body.toString();
   if (typeof FormData !== 'undefined' && body instanceof FormData) {
-    const parts: string[] = [];
-    body.forEach((value: any, key: string) => {
-      if (typeof value === 'object' && value && value.name) {
-        parts.push(`${key}: (binary file) ${value.name} [${value.size || 0} bytes]`);
-      } else {
-        parts.push(`${key}: ${value}`);
-      }
-    });
-    return parts.join('\n');
+    try {
+      const parts: string[] = [];
+      body.forEach((value: any, key: string) => {
+        if (typeof value === 'object' && value && value.name) {
+          parts.push(`${key}: (binary file) ${value.name} [${value.size || 0} bytes]`);
+        } else {
+          parts.push(`${key}: ${value}`);
+        }
+      });
+      return parts.join('\n');
+    } catch {
+      return String(body);
+    }
   }
   try {
     if (typeof body === 'object') {
@@ -290,11 +300,11 @@ class TrueNetworkTool implements Tool {
     const root = this._root;
     if (!root) return;
     root.addEventListener('click', (event: Event) => {
-      const target = event.target as HTMLElement;
-      const clearButton = target.closest('.tn-clear');
-      const row = target.closest('.tn-row');
-      const tab = target.closest('.tn-tab');
-      const closeButton = target.closest('.tn-close-detail');
+      const target = event.target as HTMLElement | null;
+      const clearButton = target?.closest?.('.tn-clear') as HTMLElement | null;
+      const row = target?.closest?.('.tn-row') as HTMLElement | null;
+      const tab = target?.closest?.('.tn-tab') as HTMLElement | null;
+      const closeButton = target?.closest?.('.tn-close-detail') as HTMLElement | null;
 
       if (clearButton) {
         this._entries = [];
@@ -339,9 +349,9 @@ class TrueNetworkTool implements Tool {
   private _installFetchInterceptor() {
     if (typeof window.fetch !== 'function') return;
     const originalFetch = window.fetch;
+    const tool = this;
 
-    window.fetch = function (this: any, input: any, init?: any) {
-      const tool = this as TrueNetworkTool;
+    window.fetch = function (input: any, init?: any) {
       const entry = tool._createEntry('fetch');
       let url = '';
       let method = 'GET';
@@ -371,40 +381,57 @@ class TrueNetworkTool implements Tool {
       entry.requestBody = bodyToDisplayString(body);
       tool._pushEntry(entry);
 
-      return originalFetch.call(window, input, init).then(
-        (response: Response) => {
-          entry.endTime = performance.now();
-          entry.duration = entry.endTime - entry.startTime;
-          entry.status = response.status;
-          entry.statusText = response.statusText;
-          entry.ok = response.ok;
-          entry.responseHeaders = headersToObj((response as any).headers);
-          entry.state = 'done';
-          response.clone().text().then((text) => {
-            entry.responseBody = text;
-            entry.sizeBytes = getBodySize(entry.responseHeaders, text);
+      try {
+        const result = originalFetch.call(window, input, init);
+        return Promise.resolve(result).then(
+          (response: Response) => {
+            entry.endTime = performance.now();
+            entry.duration = entry.endTime - entry.startTime;
+            entry.status = response.status;
+            entry.statusText = response.statusText;
+            entry.ok = response.ok;
+            try {
+              entry.responseHeaders = headersToObj((response as any).headers);
+            } catch {
+              entry.responseHeaders = {};
+            }
+            entry.state = 'done';
+            response.clone().text().then((text) => {
+              entry.responseBody = text;
+              entry.sizeBytes = getBodySize(entry.responseHeaders, text);
+              tool._renderList();
+            }).catch(() => {
+              entry.responseBody = '';
+              entry.sizeBytes = getBodySize(entry.responseHeaders, '');
+              tool._renderList();
+            });
             tool._renderList();
-          }).catch(() => {
-            entry.responseBody = '';
-            entry.sizeBytes = getBodySize(entry.responseHeaders, '');
+            return response;
+          },
+          (error: any) => {
+            entry.endTime = performance.now();
+            entry.duration = entry.endTime - entry.startTime;
+            entry.status = 0;
+            entry.statusText = 'Failed';
+            entry.isError = true;
+            entry.responseBody = error?.message || String(error);
+            entry.state = 'done';
             tool._renderList();
-          });
-          tool._renderList();
-          return response;
-        },
-        (error: any) => {
-          entry.endTime = performance.now();
-          entry.duration = entry.endTime - entry.startTime;
-          entry.status = 0;
-          entry.statusText = 'Failed';
-          entry.isError = true;
-          entry.responseBody = error?.message || String(error);
-          entry.state = 'done';
-          tool._renderList();
-          throw error;
-        }
-      );
-    }.bind(this) as typeof window.fetch;
+            throw error;
+          }
+        );
+      } catch (error: any) {
+        entry.endTime = performance.now();
+        entry.duration = entry.endTime - entry.startTime;
+        entry.status = 0;
+        entry.statusText = 'Failed';
+        entry.isError = true;
+        entry.responseBody = error?.message || String(error);
+        entry.state = 'done';
+        tool._renderList();
+        return Promise.reject(error);
+      }
+    } as typeof window.fetch;
   }
 
   private _installXhrInterceptor() {
@@ -414,12 +441,15 @@ class TrueNetworkTool implements Tool {
     const origSend = OrigXHR.prototype.send;
     const origSetHeader = OrigXHR.prototype.setRequestHeader;
 
-    OrigXHR.prototype.open = function (method: string, url: string) {
+    const tool = this;
+
+    OrigXHR.prototype.open = function (this: any, method: string, url: string) {
       (this as any).__tn = {
         method: (method || 'GET').toUpperCase(),
         url,
         headers: {},
       };
+      (this as any).__tnTool = tool;
       return origOpen.apply(this, arguments as any);
     };
 
@@ -431,12 +461,16 @@ class TrueNetworkTool implements Tool {
     };
 
     OrigXHR.prototype.send = function (this: any, body: any) {
-      const xhr = this as XMLHttpRequest & { __tn?: any };
+      const xhr = this as XMLHttpRequest & { __tn?: any; __tnTool?: TrueNetworkTool };
       const ctx = xhr.__tn;
       if (!ctx) return origSend.apply(this, arguments as any);
 
-      const tool = this as TrueNetworkTool;
-      const entry = tool._createEntry('xhr');
+      const toolInstance = xhr.__tnTool || tool;
+      if (!toolInstance || typeof toolInstance._createEntry !== 'function') {
+        return origSend.apply(this, arguments as any);
+      }
+
+      const entry = toolInstance._createEntry('xhr');
       const urlInfo = parseUrl(ctx.url);
       entry.url = urlInfo.full;
       entry.path = urlInfo.path;
@@ -444,7 +478,7 @@ class TrueNetworkTool implements Tool {
       entry.method = ctx.method;
       entry.requestHeaders = ctx.headers;
       entry.requestBody = bodyToDisplayString(body);
-      tool._pushEntry(entry);
+      toolInstance._pushEntry(entry);
 
       const finalize = (isError: boolean) => {
         entry.endTime = performance.now();
@@ -466,19 +500,37 @@ class TrueNetworkTool implements Tool {
           entry.sizeBytes = getBodySize(entry.responseHeaders, '');
         }
         entry.state = 'done';
-        tool._renderList();
+        toolInstance._renderList();
       };
 
-      xhr.addEventListener('load', () => finalize(false));
-      xhr.addEventListener('error', () => finalize(true));
-      xhr.addEventListener('abort', () => finalize(true));
-      xhr.addEventListener('timeout', () => finalize(true));
+      const attachListener = (type: string, listener: EventListenerOrEventListenerObject) => {
+        try {
+          if (xhr && typeof xhr.addEventListener === 'function') {
+            xhr.addEventListener(type, listener);
+          } else if (xhr && type in xhr) {
+            (xhr as any)[`on${type}`] = listener;
+          }
+        } catch {
+          // ignore objects that cannot register event listeners.
+        }
+      };
 
-      return origSend.apply(xhr, arguments as any);
-    }.bind(this);
+      attachListener('load', () => finalize(false));
+      attachListener('error', () => finalize(true));
+      attachListener('abort', () => finalize(true));
+      attachListener('timeout', () => finalize(true));
+
+      try {
+        return origSend.apply(this, arguments as any);
+      } catch (error: any) {
+        finalize(true);
+        throw error;
+      }
+    };
   }
 
   private _createEntry(type: 'fetch' | 'xhr'): RequestEntry {
+    const now = typeof performance !== 'undefined' && typeof performance.now === 'function' ? performance.now() : Date.now();
     return {
       id: `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
       type,
@@ -497,7 +549,7 @@ class TrueNetworkTool implements Tool {
       statusText: '',
       ok: null,
       isError: false,
-      startTime: performance.now(),
+      startTime: now,
       endTime: null,
     };
   }
