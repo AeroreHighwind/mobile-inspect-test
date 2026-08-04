@@ -14,7 +14,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
-     id="namedview1"
+     id="namedview2"
      pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
@@ -50,7 +50,7 @@
        apply_with_radius="true"
        only_selected="false"
        hide_knots="false" /></defs>
-       <symbol id="icon-id" viewBox="6 20 150 230">
+       <symbol id="icon-id-dark" viewBox="6 20 150 230">
        <g
      inkscape:groupmode="layer"
      id="layer2-6"

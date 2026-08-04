@@ -32,6 +32,9 @@ if (!environment.production) {
         eruda.add(networkPlugin);
       });
 
+          import('./app/modules/eruda/plugins/doom.plugin').then(({ default: doom }) => {
+        eruda.add(doom);
+      });
       // stop eruda from monkey-patching window.console itself - we take
       // over that job so native/desktop console stays 100% untouched
       eruda.get('console').config.set('overrideConsole', false);

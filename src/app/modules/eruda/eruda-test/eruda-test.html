@@ -1,11 +1,19 @@
 <div class="phone">
-    @if (showSetup) {
-    <app-loading (setupFinished)="showOrHideSetup(false)" />
-    }
+  @if (showSetup) {
+  <app-loading (setupFinished)="showOrHideSetup(false)" />
+  }
   <div style=" display: flex; justify-content: center; align-items: center; justify-items: center;">
-    <svg width="100" height="150" viewBox="0 0 400 400">
-      <use href="/svg/yorha_logo.svg#icon-id"></use>
-    </svg>
+
+@if (currentTheme === "theme-dark") {
+  <svg width="100" height="150" viewBox="0 0 400 400">
+    <use href="/svg/yorha_logo_light.svg#icon-id-light"></use>
+  </svg>
+}
+@else if (currentTheme === "theme-light") {
+  <svg width="100" height="150" viewBox="0 0 400 400">
+    <use href="/svg/yorha_logo_dark.svg#icon-id-dark"></use>
+  </svg>
+}
   </div>
   <h2>Debugger</h2>
 
@@ -27,27 +35,27 @@
 
   <button (click)="nextAndroid()">Next Android</button>
   <button (click)="previousAndroid()">Previous Android</button>
-  
+
   <button (click)="log()">Console.log</button>
-  
+
   <button (click)="warn()">Console.warn</button>
-  
+
   <button (click)="error()">Console.error</button>
-  
+
   <button (click)="table()">Console.table</button>
-  
+
   <button (click)="saveStorage()">Save localStorage</button>
-  
+
   <button (click)="loadStorage()">Load localStorage</button>
-  
+
   <button (click)="fetch404()">
     404 Fetch
   </button>
-  
+
   <button (click)="fetchNetworkError()">
     Network Error
   </button>
-  
+
   <button (click)="fetchSuccess()">Successful Fetch</button>
 
   <button (click)="domChange()">

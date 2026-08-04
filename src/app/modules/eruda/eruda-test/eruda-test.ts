@@ -5,6 +5,7 @@ import { AndroidService } from '../../yorha/services/android-service';
 import { Android } from '../../yorha/data/android-models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
+import { ThemeService } from '../../utils/services/theme';
 
 @Component({
   selector: 'app-eruda-test',
@@ -20,6 +21,7 @@ export class ErudaTestComponent {
   private readonly _currentAndroid = signal<Android>(null);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _titleCase = inject(TitleCasePipe)
+  private readonly _theme = inject(ThemeService).theme
   public showSetup = false;
   public counter = 0;
   public loading = false;
@@ -149,5 +151,11 @@ export class ErudaTestComponent {
   get selectedAndroid () {
     const computedAndroid = computed(() => this._currentAndroid())
     return computedAndroid();
+  }
+
+  get currentTheme() {
+      const val = this._theme() as string;
+  console.log('[currentTheme getter called]', val);
+  return val;
   }
 }
