@@ -40,9 +40,11 @@ export class ErudaTestComponent {
 
   table() {
     console.table([
-      { id: 3, name: '1C', role: 'Commander' },
-      { id: 1, name: '33O', role: 'Operator' },
-      { id: 2, name: '51O', role: 'Operator' }
+      { id: 1, name: '1C', role: 'Commander' },
+      { id: 2, name: '33O', role: 'Operator' },
+      { id: 3, name: '51O', role: 'Operator' },
+      { id: 4, name: '13G', role: 'Gunner' },
+      { id: 5, name: '0B', role: 'Battler' },
     ]);
   }
 

@@ -19,8 +19,15 @@ export class DeviceInfo {
     this.deviceInfo = this.deviceInfoService.collect();
     setTimeout(() => {
         console.warn('Device Info:', this.deviceInfo);
+        console.warn(this.checkOS());
     }, 1000);
     this.collected.emit(this.deviceInfo);
   }
 
+  private checkOS(): string {
+    const os = this.deviceInfo.os.toLowerCase()
+    if (os === 'android') return 'You are an android 👤'
+    if (os === 'linux') return 'You are a flight unit ✈'
+    return 'You are a machine... 🤖'
+  }
 }
